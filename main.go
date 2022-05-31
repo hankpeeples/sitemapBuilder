@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 
 	link "github.com/hankpeeples/linkParser"
 )
@@ -25,9 +26,26 @@ func main() {
 		}
 	}(resp.Body)
 
+	// final URL after any redirects if there happen to be any
+	reqUrl := resp.Request.URL
+	// base url is the base entry point of the site
+	// Ex. If `reqUrl = https://gophercises.com/demos/cyoa`
+	// 		The base url is now `https://gophercises.com`
+	baseUrl := &url.URL{
+		Scheme: reqUrl.Scheme,
+		Host:   reqUrl.Host,
+	}
+	base := baseUrl.String()
+
 	links, _ := link.Parse(resp.Body)
 
+	var hrefs []string
 	for _, l := range links {
-		fmt.Println(l)
+		switch {
+		case strings.HasPrefix(l.Href, "/"):
+			hrefs = append(hrefs, base+l.Href)
+		case strings.HasPrefix(l.Href, "http"):
+			hrefs = append(hrefs, l.Href)
+		}
 	}
 }
