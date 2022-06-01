@@ -16,6 +16,8 @@ import (
 //goland:noinspection HttpUrlsUsage
 const xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
 
+var count int = 0
+
 type loc struct {
 	Value string `xml:"loc"`
 }
@@ -26,8 +28,8 @@ type urlSet struct {
 }
 
 func main() {
-	urlFlag := flag.String("url", "https://gophercises.com", "the url you want to build a sitemap for")
-	maxDepth := flag.Int("depth", 3, "the max number of links deep to traverse")
+	urlFlag := flag.String("url", "https://pkg.go.dev", "the url you want to build a sitemap for")
+	maxDepth := flag.Int("depth", 1, "the max number of links deep to traverse")
 	flag.Parse()
 
 	pages := bfs(*urlFlag, *maxDepth)
@@ -41,6 +43,7 @@ func main() {
 	}
 
 	fmt.Print(xml.Header)
+	fmt.Printf("<!-- Total number of links visited: %d -->\n", count)
 	enc := xml.NewEncoder(os.Stdout)
 	enc.Indent("", "    ")
 	if err := enc.Encode(toXml); err != nil {
@@ -104,7 +107,8 @@ func get(urlStr string) []string {
 		}
 	}(resp.Body)
 
-	// fmt.Println("✅ Request made to:", urlStr)
+	// update number of urls that have been visited
+	count++
 
 	// final URL after any redirects if there happen to be any
 	reqUrl := resp.Request.URL

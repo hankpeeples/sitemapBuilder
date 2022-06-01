@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Total number of links visited: 10 -->
 <urlSet xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://gophercises.com/demos/cyoa/mark-bates</loc>
+        <loc>https://pkg.go.dev/search?q=command</loc>
     </url>
     <url>
-        <loc>https://gophercises.com</loc>
+        <loc>https://pkg.go.dev/search-help</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/</loc>
+        <loc>https://pkg.go.dev/search?q=golang.org%2fx%20%23error</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/new-york</loc>
+        <loc>https://pkg.go.dev/</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/home</loc>
+        <loc>https://pkg.go.dev/search?q=io.Reader</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/debate</loc>
+        <loc>https://pkg.go.dev/search?q=%23reader%20io</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/</loc>
+        <loc>https://pkg.go.dev</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/denver</loc>
+        <loc>https://pkg.go.dev/search?q=Unmarshal</loc>
     </url>
     <url>
-        <loc>https://gophercises.com/demos/cyoa/sean-kelly</loc>
+        <loc>https://pkg.go.dev/search?q=http</loc>
+    </url>
+    <url>
+        <loc>https://pkg.go.dev/std</loc>
     </url>
 </urlSet>
