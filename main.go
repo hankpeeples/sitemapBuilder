@@ -17,6 +17,7 @@ func main() {
 
 	pages := get(*urlFlag)
 
+	fmt.Printf("Found links: ⬇️\n\n")
 	for _, page := range pages {
 		fmt.Println(page)
 	}
@@ -35,6 +36,8 @@ func get(urlStr string) []string {
 		}
 	}(resp.Body)
 
+	fmt.Println("✅ Request made to:", urlStr)
+
 	// final URL after any redirects if there happen to be any
 	reqUrl := resp.Request.URL
 	// base url is the base entry point of the site
@@ -45,6 +48,8 @@ func get(urlStr string) []string {
 		Host:   reqUrl.Host,
 	}
 	base := baseUrl.String()
+
+	fmt.Printf("⎵ Base URL: %s\n\n", base)
 
 	return filter(hrefs(resp.Body, base), withPrefix(base))
 }
