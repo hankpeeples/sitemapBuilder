@@ -46,7 +46,7 @@ func get(urlStr string) []string {
 	}
 	base := baseUrl.String()
 
-	return hrefs(resp.Body, base)
+	return filter(hrefs(resp.Body, base), withPrefix(base))
 }
 
 func hrefs(r io.Reader, base string) []string {
@@ -64,4 +64,23 @@ func hrefs(r io.Reader, base string) []string {
 	}
 
 	return ret
+}
+
+func filter(links []string, keepFn func(string) bool) []string {
+	var ret []string
+
+	for _, l := range links {
+		// only keep links that have the same domain as the original (base)
+		if keepFn(l) {
+			ret = append(ret, l)
+		}
+	}
+
+	return ret
+}
+
+func withPrefix(pfx string) func(string) bool {
+	return func(l string) bool {
+		return strings.HasPrefix(l, pfx)
+	}
 }
