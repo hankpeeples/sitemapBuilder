@@ -13,14 +13,51 @@ import (
 
 func main() {
 	urlFlag := flag.String("url", "https://gophercises.com", "the url you want to build a sitemap for")
+	maxDepth := flag.Int("depth", 3, "the max number of links deep to traverse")
 	flag.Parse()
 
-	pages := get(*urlFlag)
+	pages := bfs(*urlFlag, *maxDepth)
+	// pages := get(*urlFlag)
 
-	fmt.Printf("Found links: ⬇️\n\n")
+	fmt.Printf("Found pages: ⬇️\n\n")
 	for _, page := range pages {
 		fmt.Println(page)
 	}
+}
+
+func bfs(urlStr string, maxDepth int) []string {
+	// keep track of all urls that have been visited
+	// https://dave.cheney.net/2014/03/25/the-empty-struct
+	seen := make(map[string]struct{})
+	// string is the key, struct is the type
+	var q map[string]struct{}
+	// all unseen links, these are child links from links that have been visited
+	nq := map[string]struct{}{
+		urlStr: struct{}{},
+	}
+
+	for i := 0; i <= maxDepth; i++ {
+		// `q` will become whatever is in `nq`, then make a new `nq` for use
+		q, nq = nq, make(map[string]struct{})
+		for page, _ := range q {
+			// if `page` was `seen` in the map, `ok` will be true
+			if _, ok := seen[page]; ok {
+				// skip it
+				continue
+			}
+			// mark page as seen
+			seen[page] = struct{}{}
+			for _, l := range get(page) {
+				// put each link in the next queue
+				nq[l] = struct{}{}
+			}
+		}
+	}
+	ret := make([]string, 0, len(seen))
+	for page, _ := range seen {
+		ret = append(ret, page)
+	}
+	return ret
 }
 
 func get(urlStr string) []string {
@@ -36,7 +73,7 @@ func get(urlStr string) []string {
 		}
 	}(resp.Body)
 
-	fmt.Println("✅ Request made to:", urlStr)
+	// fmt.Println("✅ Request made to:", urlStr)
 
 	// final URL after any redirects if there happen to be any
 	reqUrl := resp.Request.URL
@@ -49,7 +86,7 @@ func get(urlStr string) []string {
 	}
 	base := baseUrl.String()
 
-	fmt.Printf("⎵ Base URL: %s\n\n", base)
+	// fmt.Printf("⎵ Base URL: %s\n\n", base)
 
 	return filter(hrefs(resp.Body, base), withPrefix(base))
 }
