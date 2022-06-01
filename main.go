@@ -1,15 +1,29 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	link "github.com/hankpeeples/linkParser"
 )
+
+//goland:noinspection HttpUrlsUsage
+const xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+
+type loc struct {
+	Value string `xml:"loc"`
+}
+
+type urlSet struct {
+	Urls  []loc  `xml:"url"`
+	Xmlns string `xml:"xmlns,attr"`
+}
 
 func main() {
 	urlFlag := flag.String("url", "https://gophercises.com", "the url you want to build a sitemap for")
@@ -17,12 +31,22 @@ func main() {
 	flag.Parse()
 
 	pages := bfs(*urlFlag, *maxDepth)
-	// pages := get(*urlFlag)
 
-	fmt.Printf("Found pages: ⬇️\n\n")
-	for _, page := range pages {
-		fmt.Println(page)
+	toXml := urlSet{
+		Xmlns: xmlns,
 	}
+
+	for _, page := range pages {
+		toXml.Urls = append(toXml.Urls, loc{page})
+	}
+
+	fmt.Print(xml.Header)
+	enc := xml.NewEncoder(os.Stdout)
+	enc.Indent("", "    ")
+	if err := enc.Encode(toXml); err != nil {
+		panic(err)
+	}
+	fmt.Println()
 }
 
 func bfs(urlStr string, maxDepth int) []string {
@@ -39,6 +63,11 @@ func bfs(urlStr string, maxDepth int) []string {
 	for i := 0; i <= maxDepth; i++ {
 		// `q` will become whatever is in `nq`, then make a new `nq` for use
 		q, nq = nq, make(map[string]struct{})
+
+		if len(q) == 0 {
+			break
+		}
+
 		for page, _ := range q {
 			// if `page` was `seen` in the map, `ok` will be true
 			if _, ok := seen[page]; ok {
@@ -48,8 +77,10 @@ func bfs(urlStr string, maxDepth int) []string {
 			// mark page as seen
 			seen[page] = struct{}{}
 			for _, l := range get(page) {
-				// put each link in the next queue
-				nq[l] = struct{}{}
+				if _, ok := seen[l]; !ok {
+					// put each link in the next queue
+					nq[l] = struct{}{}
+				}
 			}
 		}
 	}
